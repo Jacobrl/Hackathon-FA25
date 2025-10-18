@@ -1,5 +1,6 @@
 ---
-title: "JacobLevin EDA Analysis"
+title: "NextGen Host Exploratory Data Analysis (EDA)"
+author: "Jacob Levin, "
 output: word_document
 date: "2025-10-18"
 ---
@@ -9,27 +10,113 @@ library(tidyverse)
 library(ggplot2)
 # install.packages("readxl")
 library(readxl)
+# install.packages("skimr")
+library(skimr)
 
-msg_data <- read_excel("2025 Q2 Hackathxon - Messaging Product Data.xlsm")
+msg_data <- read_excel("2025 Q2 Hackathon - Messaging Product Data .xlsm")
 product_data <- read_excel("2025 Q2 Hackathon Welcome Product Data - UPDATED 10_16.xlsx")
 ```
 
-## R Markdown
+# Obejctives for EDA
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## **Digital Adoption Patterns**
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+**Goal:** Understand where and how guests are (or aren’t) using Hilton’s digital tools.
 
-```{r cars}
-summary(cars)
+**Key Objectives:**
+
+-   Measure **rates of digital check-in (DCI)**, **digital key (DK)** usage, and **digital check-out (DCO)** across regions, brands, and location types.
+-   Identify which **brand divisions** (Luxury, Full Service, Focused Service, etc.) have the highest and lowest adoption rates.
+-   Examine how **property type (urban, suburban, airport, interstate)** correlates with digital adoption.
+-   Detect **temporal trends**—does adoption vary by **month, day of week, or time of year**?
+
+## **Engagement & Satisfaction Relationships**
+
+**Goal:** Quantify how digital engagement links to overall guest satisfaction.
+
+**Key Objectives:**
+
+-   Compare **Stay Scores** and **Survey Metrics** (Service Quality, Cleanliness, Technology) between guests who used vs. did not use digital tools.
+-   Investigate whether **successful DK usage** leads to higher satisfaction than **failed DK attempts**.
+-   Examine correlations between **Problem Incidence / Problem Resolution** and **digital adoption rates**.
+-   Evaluate whether **properties with higher digital adoption** consistently report higher **Stay Scores** or **Technology ratings**.
+
+## **Operational Insights**
+
+**Goal:** Detect operational or systemic patterns that may affect adoption and satisfaction.
+
+**Key Objectives:**
+
+-   Evaluate whether **ownership type (franchised vs. managed)** influences digital performance.
+-   Map **regional or subregional variation** to uncover where adoption or satisfaction lags (e.g., Southeast vs. Pacific).
+-   Explore **brand-level consistency**—do properties within the same brand share similar performance or show high variance?
+-   Assess whether **length of stay** or **purpose of stay** (business vs. leisure) influences satisfaction with technology and service.
+
+##**Opportunity Identification**
+
+**Goal:** Find patterns that highlight improvement areas and innovation opportunities.
+
+**Key Objectives:**
+
+-   Identify **high-satisfaction, low-adoption properties** (untapped potential).
+
+-   Detect **low-satisfaction, high-adoption properties** (technology friction points).
+
+-   Use **correlation matrices or clustering** to uncover property groupings with similar digital and satisfaction profiles.
+
+-   Create a **ranked list of Hilton brands or regions** with the greatest opportunity for digital transformation impact.
+
+## **Data Quality & Foundation Checks**
+
+**Goal:** Ensure analytical reliability before building models or insights.\
+
+**Key Objectives:**
+
+-   Verify data completeness for key fields (Stay Score, DCI, DK, DCO).
+-   Identify and handle missing or anomalous records (e.g., negative LOS, inconsistent feedback dates).
+-   Confirm proper alignment of datasets (e.g., Stay Experience Platform data linked to Welcome Product data).
+
+# The Dataset Genetic Makeup
+
+```{r intial-data-info}
+
+# ==================msg data autotypsy==========================================
+
+msg_data_nrow <- nrow(msg_data)
+msg_data_ncol <- ncol(msg_data)
+
+col_msg_names <- c(names(msg_data))
+
+num_brand_unique <- length(unique(msg_data$brand_division_nm))
+brand_unique <- c(unique(msg_data$brand_division_nm))
+
+head(msg_data, 5)
+
+# ==================product data autotypsy======================================
+
+product_data_nrow <- nrow(product_data)
+product_data_ncol <- ncol(product_data)
+
+col_product_names <- c(names(product_data))
+
+head(product_data, 5)
 ```
+## **Messaing Dataset**
 
-## Including Plots
+The dataset for messaging has `r msg_data_nrow` rows of observations and `r msg_data_ncol` numbers of features. The features are listed below:
 
-You can also embed plots, for example:
+1. `r col_msg_names[1]`
+2. `r col_msg_names[2]`
+3. `r col_msg_names[3]`
+4. `r col_msg_names[4]`
+5. `r col_msg_names[5]`
+6. `r col_msg_names[6]`
+7. `r col_msg_names[7]`
+8. `r col_msg_names[8]`
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+The features that the NetGen Hosts will use are `r col_msg_names[1]`, `r col_msg_names[3]`, `r col_msg_names[4]`, `r col_msg_names[5]`, `r col_msg_names[6]`, `r col_msg_names[7]`, and `r col_msg_names[8]`. The problem with `r col_msg_names[2]` comes from the common practice of dropping IDs because that feature is not useful to identify patterns and trends in the dataset. The other features that will be used throughout this EDA analysis will be useful in identifying data patterns and trends due to existing dashboards and metrics created by Qualtrics during the live demo portion of Qualtrics presentation. We want to use the features identified as useful to help use understand and generate solutions around the key obejctives in operational insights.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## **Product Dataset**
+
+
+
