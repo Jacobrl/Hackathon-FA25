@@ -221,40 +221,234 @@ msg_data
 
 product_data_new
 # =============================Data Drive=======================================
-resorts_all_inclusive <- product_data_new |>
-  filter(
-    sub_brand_nm %in% c(
+
+specific_hotels <- c(
+  "Embassy Suites by Hilton Oahu Kapolei",
+  "Hilton Hawaiian Village Waikiki Beach Resort",
+  "Grand Wailea, A Waldorf Astoria Resort",
+  "Embassy Suites by Hilton Fort Lauderdale 17th Street",
+  "The Guild Hotel, San Diego, a Tribute Portfolio Hotel",
+  "Waldorf Astoria Orlando",
+  "Waldorf Astoria Monarch Beach Resort & Club",
+  "Conrad Las Vegas at Resorts World",
+  "Hotel Maren Fort Lauderdale Beach, Curio Collection by Hilton",
+  "Hilton Waterfront Beach Resort",
+  "Hilton Orlando",
+  "Waldorf Astoria Las Vegas",
+  "Ka La'i Waikiki Beach, LXR Hotels & Resorts",
+  "Arizona Biltmore, A Waldorf Astoria Resort",
+  "Embassy Suites by Hilton Denver Downtown Convention Center",
+  "Hilton New Orleans Riverside",
+  "Waldorf Astoria New Orleans",
+  "Conrad Orlando at Evermore Orlando Resort"
+)
+
+google_hotel <- c(
       "Hilton Hotels & Resorts",
       "Curio Collection by Hilton",
       "DoubleTree by Hilton",
       "Hilton All-Inclusive Resorts",
       "Waldorf Astoria Hotels & Resorts",
       "Hilton La Romana"
-    ) |
-    grepl("All-Inclusive", market_desc, ignore.case = TRUE) |
-    grepl("Resort", market_desc, ignore.case = TRUE)
+    )
+
+# resorts_all_inclusive <- product_data_new |>
+#   filter(
+#     sub_brand_nm %in% specific_hotels |
+#     grepl("All-Inclusive", market_desc, ignore.case = TRUE) |
+#     grepl("Resort", market_desc, ignore.case = TRUE)
+#   ) |>
+#   mutate(
+#     tier_name = case_when(
+#       tier_ind == "B" ~ "Base",
+#       tier_ind == "S" ~ "Silver",
+#       tier_ind == "G" ~ "Gold",
+#       tier_ind == "D" ~ "Diamond",
+#       tier_ind == "UNK" ~ "Unknown",
+#       TRUE ~ "Other"
+#     )
+#   ) |>
+#   select(-brand_division_nm) |>
+#   group_by(tier_name) |>
+#   summarise(
+#     across(
+#       where(is.numeric),
+#       list(
+#         mean = \(x) mean(x, na.rm = TRUE),
+#         median = \(x) median(x, na.rm = TRUE)
+#       ),
+#       .names = "{.col}_{.fn}"
+#     )
+#   ) |>
+#   mutate(across(where(is.numeric), \(x) round(x, 4)))
+
+
+resorts_all_inclusive <- product_data_new |>
+  filter(brand_division_nm == "Luxury")|>
+  mutate(
+    tier_name = case_when(
+      tier_ind == "B" ~ "Base",
+      tier_ind == "S" ~ "Silver",
+      tier_ind == "G" ~ "Gold",
+      tier_ind == "D" ~ "Diamond",
+      tier_ind == "UNK" ~ "Unknown",
+      TRUE ~ "Other"
+    )
   ) |>
-  select(-brand_division_nm) |>
-  group_by(tier_ind) |>
+  group_by(tier_name, sub_brand_nm) |>
   summarise(
     across(
-      where(is.numeric),  
+      where(is.numeric),
       list(
-        mean = \(x) mean(x, na.rm = TRUE),
-        median = \(x) median(x, na.rm = TRUE)
+        mean = \(x) mean(x, na.rm = TRUE)
       ),
       .names = "{.col}_{.fn}"
     )
   ) |>
   mutate(across(where(is.numeric), \(x) round(x, 4)))
 
+msg_data_new |>
+  filter(brand_division_nm == "Luxury") |>
+  summarise(
+    across(
+      where(is.numeric),
+      list(
+        mean = \(x) mean(x, na.rm = TRUE)
+      ),
+      .names = "{.col}_{.fn}"
+    )
+  )
+
+resorts_all_inclusive |>
+  select(-room_count_mean,
+         -total_stays_mean) |>
+  filter(sub_brand_nm == "LXR Hotels and Resorts")
+  
+
+write_xlsx(resorts_all_inclusive , "resorts_all_inclusive.xlsx")
+
+resorts_all_inclusive_msg <- msg_data_new |>
+  filter(
+    brand_division_nm == "Luxury" &
+    grepl("Hawaii|HI", market_desc, ignore.case = TRUE)
+  )
+
+resorts_all_inclusive_msg
+
+
 resorts_all_inclusive 
 
+resorts_all_inclusive_msg <- msg_data_new |>
+  filter(
+    brand_division_nm == "Luxury" &
+    grepl("Hawaii|HI", market_desc, ignore.case = TRUE)
+  )
+
+
+graph_data <- product_data_new |>
+  select(brand_division_nm, dk_succesful_stays, dco_completes, dci_complete) |>
+  group_by(brand_division_nm) |>
+  summarise(
+    across(
+      where(is.numeric),
+      list(
+        mean = \(x) mean(x, na.rm = TRUE)
+      ),
+      .names = "{.col}_{.fn}"
+    )
+  )
+
+graph_data
+  
+graph_data_msg <- msg_data_new |>
+  select(brand_division_nm, `Welcome Message Sent Ratio`) |>
+  group_by(brand_division_nm) |>
+  summarise(
+    across(
+      where(is.numeric),
+      list(
+        mean = \(x) mean(x, na.rm = TRUE)
+      ),
+      .names = "{.col}_{.fn}"
+    )
+  )
+
+graph_data_msg
+
+mean(resorts_all_inclusive$dci_complete_mean)
+mean(resorts_all_inclusive$dco_completes_mean)
+mean(resorts_all_inclusive$dk_succesful_stays_mean)
 
 
 ```
 
 ```{r Graphs-And-Summaries}
+library(ggplot2)
+library(tidyr)
+library(scales)
+
+# Pivot longer for ggplot
+graph_data_long <- graph_data |>
+  pivot_longer(
+    cols = c(dk_succesful_stays_mean, dco_completes_mean, dci_complete_mean),
+    names_to = "metric",
+    values_to = "mean_value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+      "dci_complete_mean" = "Digital Check-In (DCI)",
+      "dk_succesful_stays_mean" = "Digital Key (DK)",
+      "dco_completes_mean" = "Digital Check-Out (DCO)"
+    ),
+    # 👇 Metric order (DCI → DK → DCO)
+    metric = factor(metric, levels = c("Digital Check-In (DCI)", "Digital Key (DK)", "Digital Check-Out (DCO)")),
+    # 👇 Brand division order (left-to-right)
+    brand_division_nm = factor(
+      brand_division_nm,
+      levels = c("Focused Service", "All Suites", "Lifestyle", "Full Service", "Luxury")
+    )
+  )
+
+# ---- Grouped bar chart ----
+ggplot(graph_data_long, aes(x = brand_division_nm, y = mean_value, fill = metric)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  scale_fill_manual(
+    values = c(
+      "Digital Check-In (DCI)"  = "#4D4D4D",  # dark grey
+      "Digital Key (DK)"        = "#999999",  # medium grey
+      "Digital Check-Out (DCO)" = "#D9D9D9"   # light grey
+    )
+  ) +
+  scale_y_continuous(
+    labels = percent_format(accuracy = 1),
+    limits = c(0, 1)
+  ) +
+  labs(
+    title = "Average Digital Tool Usage by Hilton Brand Division",
+    x = "Brand Division",
+    y = "Average Usage Rate",
+    fill = "Digital Tool"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "right"
+  )
+
+# Save the most recently displayed ggplot
+ggsave(
+  filename = "digital_tool_usage_by_brand_division.png",  # file name
+  plot = last_plot(),  # saves the last ggplot drawn
+  width = 10,          # width in inches
+  height = 6,          # height in inches
+  dpi = 300            # high resolution (good for slides/reports)
+)
+
+
+
+
 
 ```
 
