@@ -1,11 +1,17 @@
 ---
-title: "JacobLevin_EDA"
+title: "JacobLevin EDA Analysis"
 output: word_document
 date: "2025-10-18"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r loading-libraries-and-data, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+# install.packages("readxl")
+library(readxl)
+
+msg_data <- read_excel("2025 Q2 Hackathxon - Messaging Product Data .xlsm")
+product_data <- read_excel("2025 Q2 Hackathon Welcome Product Data - UPDATED 10_16.xlsx")
 ```
 
 ## R Markdown
