@@ -137,12 +137,58 @@ The dataset for messaging has `r product_data_nrow ` rows of observations and `r
 15. `r col_product_names[15]`
 16. `r col_product_names[16]`
 
-The features that will be used are will be every other column that is not `r col_product_names[1]` and `r col_product_names[2]`. Those columns are being dropped because features like ID is not useful to identify patterns and trends in the dataset. The other features that will be used throughout this EDA analysis will be useful in identifying data patterns and trends due to existing dashboards and metrics created by Qualtrics during the live demo portion of Qualtrics presentation. We want to use the other features as useful to help use understand and generate solutions around the key objectives in digital adoption pattern, engagement & satisfaction relationship and opportunity identification.
+The features that will be used are will be every other column that is not `r col_product_names[1]`, `r col_product_names[2]`, and `r col_product_names[6]`. Those columns are being dropped because features like ID is not useful to identify patterns and trends in the dataset. The other features that will be used throughout this EDA analysis will be useful in identifying data patterns and trends due to existing dashboards and metrics created by Qualtrics during the live demo portion of Qualtrics presentation. The product dataset is based in the US so the column is redundant. We want to use the other features as useful to help use understand and generate solutions around the key objectives in digital adoption pattern, engagement & satisfaction relationship and opportunity identification.
 
 # Exploratory Data Analysis
 
-```{r Graphs-And-Summaries}
+```{r cleaning-data}
+# ============================Cleaning Data=====================================
 
+msg_data_new <- msg_data |>
+  select(-anonymized_id)
+
+msg_data_new
+
+product_data_new <- product_data |>
+  mutate(
+    market_desc = paste(market_city, market_state, sep = ", ")
+  ) |>
+  select(-market_city, -market_state) |>
+  relocate(market_desc, .after = 6) |>
+  select(-stay_id, -anonymized_hotel_id, -country_cd)
+
+product_data_new
+
+
+# ============================Processing Product Data===========================
+
+
+brandNM_msg_data <- msg_data_new |>
+  select(-market_desc, 
+         -`Average Message Response Time`) |>
+  group_by(brand_division_nm) |>
+    summarise(
+    across(
+      c(`Welcome Message Sent Ratio`,
+        `Message Response Rate`,
+        Conversations,
+        `Total Messages`),
+      list(
+        mean = \(x) mean(x, na.rm = TRUE),
+        median = \(x) median(x, na.rm = TRUE),
+        sd = \(x) sd(x, na.rm = TRUE),
+        var = \(x) var(x, na.rm = TRUE)
+      ),
+      .names = "{.col}_{.fn}"
+    )
+  ) |>
+  mutate(across(where(is.numeric), \(x) round(x, 2)))
+
+brandNM_msg_data
+  
+```
+
+```{r Graphs-And-Summaries}
 
 ```
 
