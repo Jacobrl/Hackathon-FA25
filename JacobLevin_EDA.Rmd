@@ -13,6 +13,8 @@ library(readxl)
 # install.packages("skimr")
 library(skimr)
 library(dplyr)
+# install.packages("writexl")
+library(writexl)
 
 msg_data <- read_excel("2025 Q2 Hackathon - Messaging Product Data .xlsm")
 product_data <- read_excel("2025 Q2 Hackathon Welcome Product Data - UPDATED 10_16.xlsx")
@@ -187,8 +189,24 @@ brandNM_msg_data <- msg_data_new |>
   ) |>
   mutate(across(where(is.numeric), \(x) round(x, 2)))
 
-brandNM_msg_data
+DCI_DCO <- product_data_new |>
+  group_by(brand_division_nm) |>
+  summarise(
+    across(
+      where(is.numeric),  
+      list(
+        mean = \(x) mean(x, na.rm = TRUE),
+        median = \(x) median(x, na.rm = TRUE)
+      ),
+      .names = "{.col}_{.fn}"
+    )
+  ) |>
+  mutate(across(where(is.numeric), \(x) round(x, 2)))
   
+DCI_DCO 
+
+write_xlsx(DCI_DCO, "DCI_DCO_summary.xlsx")
+
 msg_data_new
 # Welcome Message Sent Ratio
 # every 10 guests they received a x portion of welcome messages avg by hotel
@@ -201,7 +219,38 @@ msg_data_new |>
 
 msg_data
 
-product_data
+product_data_new
+# =============================Data Drive=======================================
+resorts_all_inclusive <- product_data_new |>
+  filter(
+    sub_brand_nm %in% c(
+      "Hilton Hotels & Resorts",
+      "Curio Collection by Hilton",
+      "DoubleTree by Hilton",
+      "Hilton All-Inclusive Resorts",
+      "Waldorf Astoria Hotels & Resorts",
+      "Hilton La Romana"
+    ) |
+    grepl("All-Inclusive", market_desc, ignore.case = TRUE) |
+    grepl("Resort", market_desc, ignore.case = TRUE)
+  ) |>
+  select(-brand_division_nm) |>
+  group_by(tier_ind) |>
+  summarise(
+    across(
+      where(is.numeric),  
+      list(
+        mean = \(x) mean(x, na.rm = TRUE),
+        median = \(x) median(x, na.rm = TRUE)
+      ),
+      .names = "{.col}_{.fn}"
+    )
+  ) |>
+  mutate(across(where(is.numeric), \(x) round(x, 4)))
+
+resorts_all_inclusive 
+
+
 
 ```
 
