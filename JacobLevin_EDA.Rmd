@@ -80,7 +80,7 @@ product_data <- read_excel("2025 Q2 Hackathon Welcome Product Data - UPDATED 10_
 
 ```{r intial-data-info}
 
-# ==================msg data autotypsy==========================================
+# ==================msg data autopsy============================================
 
 msg_data_nrow <- nrow(msg_data)
 msg_data_ncol <- ncol(msg_data)
@@ -92,7 +92,7 @@ brand_unique <- c(unique(msg_data$brand_division_nm))
 
 head(msg_data, 5)
 
-# ==================product data autotypsy======================================
+# ==================product data autopsy========================================
 
 product_data_nrow <- nrow(product_data)
 product_data_ncol <- ncol(product_data)
@@ -114,9 +114,35 @@ The dataset for messaging has `r msg_data_nrow` rows of observations and `r msg_
 7. `r col_msg_names[7]`
 8. `r col_msg_names[8]`
 
-The features that the NetGen Hosts will use are `r col_msg_names[1]`, `r col_msg_names[3]`, `r col_msg_names[4]`, `r col_msg_names[5]`, `r col_msg_names[6]`, `r col_msg_names[7]`, and `r col_msg_names[8]`. The problem with `r col_msg_names[2]` comes from the common practice of dropping IDs because that feature is not useful to identify patterns and trends in the dataset. The other features that will be used throughout this EDA analysis will be useful in identifying data patterns and trends due to existing dashboards and metrics created by Qualtrics during the live demo portion of Qualtrics presentation. We want to use the features identified as useful to help use understand and generate solutions around the key obejctives in operational insights.
+The features that the NetGen Hosts will be used are `r col_msg_names[1]`, `r col_msg_names[3]`, `r col_msg_names[4]`, `r col_msg_names[5]`, `r col_msg_names[6]`, `r col_msg_names[7]`, and `r col_msg_names[8]`. The problem with `r col_msg_names[2]` comes from the common practice of dropping IDs because that feature is not useful to identify patterns and trends in the dataset. The other features that will be used throughout this EDA analysis will be useful in identifying data patterns and trends due to existing dashboards and metrics created by Qualtrics during the live demo portion of Qualtrics presentation. We want to use the features identified as useful to help use understand and generate solutions around the key objectives in operational insights and opportunity identification.
 
 ## **Product Dataset**
 
+The dataset for messaging has `r product_data_nrow ` rows of observations and `r product_data_ncol` numbers of features. The features are listed below:
 
+1. `r col_product_names[1]`
+2. `r col_product_names[2]`
+3. `r col_product_names[3]`
+4. `r col_product_names[4]`
+5. `r col_product_names[5]`
+6. `r col_product_names[6]`
+7. `r col_product_names[7]`
+8. `r col_product_names[8]`
+9. `r col_product_names[9]`
+10. `r col_product_names[10]`
+11. `r col_product_names[11]`
+12. `r col_product_names[12]`
+13. `r col_product_names[13]`
+14. `r col_product_names[14]`
+15. `r col_product_names[15]`
+16. `r col_product_names[16]`
+
+The features that will be used are will be every other column that is not `r col_product_names[1]` and `r col_product_names[2]`. Those columns are being dropped because features like ID is not useful to identify patterns and trends in the dataset. The other features that will be used throughout this EDA analysis will be useful in identifying data patterns and trends due to existing dashboards and metrics created by Qualtrics during the live demo portion of Qualtrics presentation. We want to use the other features as useful to help use understand and generate solutions around the key objectives in digital adoption pattern, engagement & satisfaction relationship and opportunity identification.
+
+# Exploratory Data Analysis
+
+```{r Graphs-And-Summaries}
+
+
+```
 
