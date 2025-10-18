@@ -10,7 +10,7 @@ library(ggplot2)
 # install.packages("readxl")
 library(readxl)
 
-msg_data <- read_excel("2025 Q2 Hackathxon - Messaging Product Data .xlsm")
+msg_data <- read_excel("2025 Q2 Hackathxon - Messaging Product Data.xlsm")
 product_data <- read_excel("2025 Q2 Hackathon Welcome Product Data - UPDATED 10_16.xlsx")
 ```
 
