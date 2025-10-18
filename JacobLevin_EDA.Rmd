@@ -12,6 +12,7 @@ library(ggplot2)
 library(readxl)
 # install.packages("skimr")
 library(skimr)
+library(dplyr)
 
 msg_data <- read_excel("2025 Q2 Hackathon - Messaging Product Data .xlsm")
 product_data <- read_excel("2025 Q2 Hackathon Welcome Product Data - UPDATED 10_16.xlsx")
@@ -145,8 +146,11 @@ The features that will be used are will be every other column that is not `r col
 # ============================Cleaning Data=====================================
 
 msg_data_new <- msg_data |>
-  select(-anonymized_id)
-
+  select(-anonymized_id) |>
+  mutate(
+    `Average Message Response Time` = format(`Average Message Response Time`, 
+                                             "%H:%M:%S")
+  )
 msg_data_new
 
 product_data_new <- product_data |>
@@ -161,7 +165,6 @@ product_data_new
 
 
 # ============================Processing Product Data===========================
-
 
 brandNM_msg_data <- msg_data_new |>
   select(-market_desc, 
@@ -186,6 +189,20 @@ brandNM_msg_data <- msg_data_new |>
 
 brandNM_msg_data
   
+msg_data_new
+# Welcome Message Sent Ratio
+# every 10 guests they received a x portion of welcome messages avg by hotel
+# how long does it take for the team to message person X
+# conversation is measured by a two-way conversation and the messages is total count
+
+msg_data_new |>
+  filter(brand_division_nm == "Luxury")
+
+
+msg_data
+
+product_data
+
 ```
 
 ```{r Graphs-And-Summaries}
